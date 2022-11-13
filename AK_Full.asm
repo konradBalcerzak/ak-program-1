@@ -36,15 +36,19 @@ PTL_WYB 	 LXI H,WYBIERZ
 	 MOV A,M  
 	 CPI '1'  
 	 CZ ADR_DOD  
-	 JZ PO_WYB  
+	 JZ PO_WYB
+     ;Szybki fix do odejmowania	 
 	 CPI '3'  
-	 CZ ADR_OD  
+	 CZ ADR_OD
+	 LXI H,WYB_OP
+	 MOV A,M
+	 CPI '3'
 	 JZ PO_WYB  
 	 JMP PTL_WYB  
 PO_WYB 	 MOV A,D ; D powinno zawierac wartosc 0-2  
 	 CPI 0  
 	 JZ WYSWIETL_WYNIK  
-	 MVI A,D  
+	 MOV A,D  
 	 RST 1  
 WYSWIETL_WYNIK 	 MOV A,B  
 	 RST 4  
@@ -72,54 +76,18 @@ DRUGA 	 DB 'Liczba 2:',13,10,'> @'
 ; Procedury kalkulatora  
 ADR_DOD 	 RET  
 ADR_INW 	 RET  
-ADR_OD MVI L,00H	 
-	 MOV A,B  
-	 ADI 80H  
-	 JP OD_OLDER_TEST2  
-	 MOV A,D  
-	 ADI 80H  
-	 JP OD_SWAP  
+ADR_OD MVI L,00H	        
 	 MOV A,B  
 	 SUB D  
-	 JM OD_SWAP  
+	 JC OD_SWAP  
 	 JZ OD_YOUNG_TEST1  
-	 JMP OD_SUBSTRACT  
-;Jesli starzy bajt pierwszej liczby jest wiekszy od 7Fh    
-OD_OLDER_TEST2 	 MOV A,D  
-	 ADI 80H  
-	 JM OD_SUBSTRACT  
-	 MOV A,D  
-	 SUI 80H  
-	 MOV H,A  
-	 MOV A,B  
-	 SUI 80H  
-	 SUB H  
-	 JZ OD_YOUNG_TEST1  
-	 JM OD_SWAP  
 	 JMP OD_SUBSTRACT  
 ;Jesli starsze bajty obu liczb sa sobie rowne, porownujemy mlodzse bajty w ten sam sposób    
-OD_YOUNG_TEST1 	 MOV A,C  
-	 ADI 80H  
-	 JP OD_YOUNG_TEST2  
-	 MOV A,E  
-	 ADI 80H  
-	 JP OD_SWAP  
-	 MOV A,C  
+OD_YOUNG_TEST1 	   MOV A,C  
 	 SUB E  
-	 JM OD_SWAP  
-	 JMP OD_SUBSTRACT  
-OD_YOUNG_TEST2 	 MOV A,E  
-	 ADI 80H
-	JM OD_SUBSTRACT  	 
-	 MOV A,E  
-	 SUI 80H  
-	 MOV H,A  
-	 MOV A,C  
-	 SUI 80H  
-	 SUB H  
-	 JM OD_SWAP  
-	 JMP OD_SUBSTRACT  
-;Jesli druga liczba jest wieksza od pierwszej, zamieniamy je miejsciami a wynik bedzie ujemny, na L wrzuca 2  
+	 JC OD_SWAP  
+	 JMP OD_SUBSTRACT    
+;Jesli druga liczba jest wieksza od pierwszej, zamieniamy je miejsciami a wynik bedzie ujemny, na L wrzuca znak '-'  
 OD_SWAP 	 MOV H,B  
 	 MOV L,C  
 	 MOV B,D  
