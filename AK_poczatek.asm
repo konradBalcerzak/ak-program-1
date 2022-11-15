@@ -36,15 +36,18 @@ PTL_WYB 	 LXI H,WYBIERZ
 	 MOV A,M  
 	 CPI '1'  
 	 CZ ADR_DOD  
-	 JZ PO_WYB  
+	 JZ PO_WYB   ;Szybki fix do odejmowania	 
 	 CPI '3'  
-	 CZ ADR_OD  
+	 CZ ADR_OD
+	 LXI H,WYB_OP
+	 MOV A,M
+	 CPI '3'
 	 JZ PO_WYB  
 	 JMP PTL_WYB  
 PO_WYB 	 MOV A,D ; D powinno zawierac wartosc 0-2  
 	 CPI 0  
 	 JZ WYSWIETL_WYNIK  
-	 MVI A,D  
+	 MOV A,D  
 	 RST 1  
 WYSWIETL_WYNIK 	 MOV A,B  
 	 RST 4  
