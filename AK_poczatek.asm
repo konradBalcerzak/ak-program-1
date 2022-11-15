@@ -1,6 +1,10 @@
 	 ORG 800H  
 ; Program  
-PTL_WYB 	 LXI H,WYBIERZ  
+PTL_WYB 	 LXI H,PIERW  
+	 RST 3  
+	 RST 5  
+	 CALL OUT_CRLF  
+	 LXI H,WYBIERZ  
 	 RST 3  
 	 LXI H,AKCJA_1  
 	 RST 3  
@@ -17,10 +21,6 @@ PTL_WYB 	 LXI H,WYBIERZ
 	 MOV M,A  
 	 CALL OUT_CRLF  
 	 MOV A,M  
-	 LXI H,PIERW  
-	 RST 3  
-	 RST 5  
-	 CALL OUT_CRLF  
 	 LXI H,WYB_OP  
 	 MOV A,M  
 	 MOV B,D  
