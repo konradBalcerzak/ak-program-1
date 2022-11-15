@@ -1,6 +1,10 @@
 	 ORG 800H  
 ; Program  
-PTL_WYB 	 LXI H,WYBIERZ  
+PTL_WYB 	 LXI H,PIERW  
+	 RST 3  
+	 RST 5  
+	 CALL OUT_CRLF  
+	 LXI H,WYBIERZ  
 	 RST 3  
 	 LXI H,AKCJA_1  
 	 RST 3  
@@ -17,10 +21,6 @@ PTL_WYB 	 LXI H,WYBIERZ
 	 MOV M,A  
 	 CALL OUT_CRLF  
 	 MOV A,M  
-	 LXI H,PIERW  
-	 RST 3  
-	 RST 5  
-	 CALL OUT_CRLF  
 	 LXI H,WYB_OP  
 	 MOV A,M  
 	 MOV B,D  
@@ -36,8 +36,7 @@ PTL_WYB 	 LXI H,WYBIERZ
 	 MOV A,M  
 	 CPI '1'  
 	 CZ ADR_DOD  
-	 JZ PO_WYB
-     ;Szybki fix do odejmowania	 
+	 JZ PO_WYB   ;Szybki fix do odejmowania	 
 	 CPI '3'  
 	 CZ ADR_OD
 	 LXI H,WYB_OP
@@ -76,6 +75,13 @@ DRUGA 	 DB 'Liczba 2:',13,10,'> @'
 ; Procedury kalkulatora  
 ADR_DOD 	 RET  
 ADR_INW 	 RET  
+;Przyjmuje:    
+;BC - pierwsza liczba    
+;DE - druga liczba    
+;Wynik w rejestrze BC    
+;Znak wyniku w rejestrze D('-' lub 00H) 
+;sprawdzenie czy pierwsza liczba jest wieksza od drugiej    
+;Odejmujemy liczbe 2 od liczby 1, jesli nastapi przenisienie(flaga CY=1) to znaczy ze liczba 2 jest wieksza
 ADR_OD MVI L,00H	        
 	 MOV A,B  
 	 SUB D  
@@ -106,5 +112,3 @@ OD_SUBSTRACT 	 STC
 	 SBB D  
 	 MOV B,A  
      MOV D,L	
-     MVI A,0	 
-	 RET

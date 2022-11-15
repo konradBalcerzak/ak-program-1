@@ -1,6 +1,10 @@
 	 ORG 800H  
 ; Program  
-PTL_WYB 	 LXI H,WYBIERZ  
+PTL_WYB 	 LXI H,PIERW  
+	 RST 3  
+	 RST 5  
+	 CALL OUT_CRLF  
+	 LXI H,WYBIERZ  
 	 RST 3  
 	 LXI H,AKCJA_1  
 	 RST 3  
@@ -17,10 +21,6 @@ PTL_WYB 	 LXI H,WYBIERZ
 	 MOV M,A  
 	 CALL OUT_CRLF  
 	 MOV A,M  
-	 LXI H,PIERW  
-	 RST 3  
-	 RST 5  
-	 CALL OUT_CRLF  
 	 LXI H,WYB_OP  
 	 MOV A,M  
 	 MOV B,D  
@@ -36,15 +36,18 @@ PTL_WYB 	 LXI H,WYBIERZ
 	 MOV A,M  
 	 CPI '1'  
 	 CZ ADR_DOD  
-	 JZ PO_WYB  
+	 JZ PO_WYB   ;Szybki fix do odejmowania	 
 	 CPI '3'  
-	 CZ ADR_OD  
+	 CZ ADR_OD
+	 LXI H,WYB_OP
+	 MOV A,M
+	 CPI '3'
 	 JZ PO_WYB  
 	 JMP PTL_WYB  
 PO_WYB 	 MOV A,D ; D powinno zawierac wartosc 0-2  
 	 CPI 0  
 	 JZ WYSWIETL_WYNIK  
-	 MVI A,D  
+	 MOV A,D  
 	 RST 1  
 WYSWIETL_WYNIK 	 MOV A,B  
 	 RST 4  
