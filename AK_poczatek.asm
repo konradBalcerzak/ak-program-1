@@ -11,7 +11,9 @@ PTL_WYB 	 LXI H,PIERW
 	 LXI H,AKCJA_2  
 	 RST 3  
 	 LXI H,AKCJA_3  
-	 RST 3  
+	 RST 3
+	 LXI H,AKCJA_4  
+	 RST 3 	 
 	 MVI A,'>'  
 	 RST 1  
 	 MVI A,' '  
@@ -25,26 +27,30 @@ PTL_WYB 	 LXI H,PIERW
 	 MOV A,M  
 	 MOV B,D  
 	 MOV C,E  
-	 CPI '2'  
+	 CPI 'n'  
 	 CZ ADR_INW  
-	 JZ PO_WYB  
+	 JZ PO_WYB
+	 CPI 'x'
+	 JZ EXIT
 	 LXI H,DRUGA  
 	 RST 3  
 	 RST 5  
 	 CALL OUT_CRLF  
 	 LXI H,WYB_OP  
 	 MOV A,M  
-	 CPI '1'  
+	 CPI '+'  
 	 CZ ADR_DOD  
 	 JZ PO_WYB   ;Szybki fix do odejmowania	 
-	 CPI '3'  
+	 CPI '-'  
 	 CZ ADR_OD
 	 LXI H,WYB_OP
 	 MOV A,M
-	 CPI '3'
+	 CPI '-'
 	 JZ PO_WYB  
 	 JMP PTL_WYB  
-PO_WYB 	 MOV A,D ; D powinno zawierac wartosc 0-2  
+PO_WYB LXI H,WYNIK
+     RST 3	 
+	 MOV A,D ; D powinno zawierac wartosc 0-2  
 	 CPI 0  
 	 JZ WYSWIETL_WYNIK  
 	 MOV A,D  
@@ -55,8 +61,9 @@ WYSWIETL_WYNIK 	 MOV A,B
 	 RST 4  
 	 MVI A,'h'  
 	 RST 1  
-	 CALL OUT_CRLF  
-	 HLT  
+	 CALL OUT_CRLF
+     JMP PTL_WYB 
+EXIT HLT  
 ; Zmienne       
 WYB_OP 	 DB 0 ; Zmienna jaka operacja zostala wybrana przez uzytjkownika              
 ; Procedury     
@@ -67,11 +74,13 @@ OUT_CRLF 	 MVI A,13
 	 RET  
 ; lancuchy  
 WYBIERZ 	 DB 'Wybierz akcje:',13,10,'@'  
-AKCJA_1 	 DB '1) Dodawanie',13,10,'@'  
-AKCJA_2 	 DB '2) Inwersja',13,10,'@'  
-AKCJA_3 	 DB '3) Odejmowanie',13,10,'@'  
-PIERW 	 DB 'Liczba jeden:',13,10,'> @'  
-DRUGA 	 DB 'Liczba 2:',13,10,'> @'  
+AKCJA_1 	 DB '+) Dodawanie',13,10,'@'  
+AKCJA_2 	 DB 'n) Inwersja',13,10,'@'  
+AKCJA_3 	 DB '-) Odejmowanie',13,10,'@'  
+AKCJA_4      DB 'x)Zakoncz program',13,10,'@'
+PIERW 	 DB 'Liczba 1:',13,10,'> @'  
+DRUGA 	 DB 'Liczba 2:',13,10,'> @'
+WYNIK    DB 'Wynik:@' 
 ; Procedury kalkulatora  
 ADR_DOD 	 RET  
 ADR_INW 	 RET  
