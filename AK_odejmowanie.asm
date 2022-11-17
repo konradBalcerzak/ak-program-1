@@ -6,7 +6,9 @@
 ;Znak wyniku w rejestrze D('-' lub 00H) 
 ;sprawdzenie czy pierwsza liczba jest wieksza od drugiej    
 ;Odejmujemy liczbe 2 od liczby 1, jesli nastapi przenisienie(flaga CY=1) to znaczy ze liczba 2 jest wieksza
-ADR_OD MVI L,00H	        
+ADR_OD STC
+     CMC
+     MVI L,00H	        
 	 MOV A,B  
 	 SUB D  
 	 JC OD_SWAP  
