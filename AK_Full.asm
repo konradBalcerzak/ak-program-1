@@ -11,7 +11,9 @@ PTL_WYB 	 LXI H,PIERW
 	 LXI H,AKCJA_2  
 	 RST 3  
 	 LXI H,AKCJA_3  
-	 RST 3  
+	 RST 3
+	 LXI H,AKCJA_4  
+	 RST 3 	 
 	 MVI A,'>'  
 	 RST 1  
 	 MVI A,' '  
@@ -25,26 +27,30 @@ PTL_WYB 	 LXI H,PIERW
 	 MOV A,M  
 	 MOV B,D  
 	 MOV C,E  
-	 CPI '2'  
+	 CPI 'n' ;wystarczy jedno porowananie poniewaz rozkaz CMA nie modyfikuje fliagi Z 
 	 CZ ADR_INW  
-	 JZ PO_WYB  
+	 JZ PO_WYB
+	 CPI 'x'
+	 JZ EXIT
 	 LXI H,DRUGA  
 	 RST 3  
 	 RST 5  
 	 CALL OUT_CRLF  
 	 LXI H,WYB_OP  
 	 MOV A,M  
-	 CPI '1'  
+	 CPI '+'  ;Wystarczy jedno porownanie poniewaz rozkaz DAD nie modyfikuje flagi Z
 	 CZ ADR_DOD  
-	 JZ PO_WYB   ;Szybki fix do odejmowania	 
-	 CPI '3'  
+	 JZ PO_WYB  
+	 CPI '-'  
 	 CZ ADR_OD
 	 LXI H,WYB_OP
 	 MOV A,M
-	 CPI '3'
+	 CPI '-' ;potrzeba drugiego porownania bo rozkazy SUB i SBB modyfikuja flage Z
 	 JZ PO_WYB  
 	 JMP PTL_WYB  
-PO_WYB 	 MOV A,D ; D powinno zawierac wartosc 0-2  
+PO_WYB LXI H,WYNIK
+     RST 3	 
+	 MOV A,D ; D powinno zawierac wartosc 0-2  
 	 CPI 0  
 	 JZ WYSWIETL_WYNIK  
 	 MOV A,D  
@@ -55,8 +61,9 @@ WYSWIETL_WYNIK 	 MOV A,B
 	 RST 4  
 	 MVI A,'h'  
 	 RST 1  
-	 CALL OUT_CRLF  
-	 HLT  
+	 CALL OUT_CRLF
+     JMP PTL_WYB 
+EXIT HLT  
 ; Zmienne       
 WYB_OP 	 DB 0 ; Zmienna jaka operacja zostala wybrana przez uzytjkownika              
 ; Procedury     
@@ -67,21 +74,33 @@ OUT_CRLF 	 MVI A,13
 	 RET  
 ; lancuchy  
 WYBIERZ 	 DB 'Wybierz akcje:',13,10,'@'  
-AKCJA_1 	 DB '1) Dodawanie',13,10,'@'  
-AKCJA_2 	 DB '2) Inwersja',13,10,'@'  
-AKCJA_3 	 DB '3) Odejmowanie',13,10,'@'  
-PIERW 	 DB 'Liczba jeden:',13,10,'> @'  
-DRUGA 	 DB 'Liczba 2:',13,10,'> @'  
+AKCJA_1 	 DB '+) Dodawanie',13,10,'@'  
+AKCJA_2 	 DB 'n) Inwersja',13,10,'@'  
+AKCJA_3 	 DB '-) Odejmowanie',13,10,'@'  
+AKCJA_4      DB 'x)Zakoncz program',13,10,'@'
+PIERW 	 DB 'Liczba 1:',13,10,'> @'  
+DRUGA 	 DB 'Liczba 2:',13,10,'> @'
+WYNIK    DB 'Wynik:@' 
+ 
 ; Procedury kalkulatora  
-ADR_DOD 	 RET  
-ADR_INW 	 RET  
-;Przyjmuje:    
-;BC - pierwsza liczba    
-;DE - druga liczba    
-;Wynik w rejestrze BC    
-;Znak wyniku w rejestrze D('-' lub 00H) 
-;sprawdzenie czy pierwsza liczba jest wieksza od drugiej    
-;Odejmujemy liczbe 2 od liczby 1, jesli nastapi przenisienie(flaga CY=1) to znaczy ze liczba 2 jest wieksza
+ADR_DOD 	 MOV H,B  
+	 MOV L,C  ;przeniesienie pierwszej liczby do HL
+	 DAD D  ;DAD D -> HL + DE = HL
+	 MVI D,0
+	 CC JED  ;jeśli wartość przekracza 4 pozycje
+	 MOV B,H  ;przeniesienie wyniku do BC
+	 MOV C,L  
+	 RET  
+JED 	 MVI D,'1'  ;jeśli wartość przekracza 4 pozycje to zostanie wypisana 1 na początku wyniku
+	 RET  
+ADR_INW 	 MOV A,B  ;przepisanie liczby do A
+	 CMA  ;negacja A = !A
+	 MOV B,A  ;przepisanie z powrotem do B
+	 MOV A,C  
+	 CMA  ;negacja
+	 MOV C,A  
+	 MVI D,0  ;wyzerowanie D żeby nic nie wypisywało na początku wyniku
+	 RET
 ADR_OD MVI L,00H	        
 	 MOV A,B  
 	 SUB D  
@@ -112,3 +131,4 @@ OD_SUBSTRACT 	 STC
 	 SBB D  
 	 MOV B,A  
      MOV D,L	
+	 RET
