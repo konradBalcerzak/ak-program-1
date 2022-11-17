@@ -83,7 +83,9 @@ DRUGA 	 DB 'Liczba 2:',13,10,'> @'
 WYNIK    DB 'Wynik:@' 
  
 ; Procedury kalkulatora  
-ADR_DOD 	 MOV H,B  
+ADR_DOD 	 STC ;CPI modyfikuja flage CY wiec przy starcie procedury nalezy ja zresetowac
+	CMC
+	MOV H,B  
 	 MOV L,C  ;przeniesienie pierwszej liczby do HL
 	 DAD D  ;DAD D -> HL + DE = HL
 	 MVI D,0
@@ -101,7 +103,9 @@ ADR_INW 	 MOV A,B  ;przepisanie liczby do A
 	 MOV C,A  
 	 MVI D,0  ;wyzerowanie D żeby nic nie wypisywało na początku wyniku
 	 RET
-ADR_OD MVI L,00H	        
+ADR_OD MVI L,00H
+     STC ;CPI modyfikuja flage CY wiec przy starcie procedury nalezy ja zresetowac
+     CMC	 
 	 MOV A,B  
 	 SUB D  
 	 JC OD_SWAP  

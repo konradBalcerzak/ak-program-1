@@ -1,4 +1,6 @@
-ADR_DOD 	 MOV H,B  
+ADR_DOD STC	 
+	 CMC
+	 MOV H,B  
 	 MOV L,C  ;przeniesienie pierwszej liczby do HL
 	 DAD D  ;DAD D -> HL + DE = HL
 	 MVI D,0
